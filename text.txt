@@ -1,0 +1,21 @@
+Provider set up( Git Hub)
+
+https://github.com/settings/developers
+
+CLIENT_ID Ov23liv1G4NdoERlblRp
+
+call back url
+https://example.com/api/auth/callback/github
+
+secret key = 6585a65f13553b17ec5ca7c9abb3155cfa0fe5c4
+
+
+Provider set up (Google)
+
+console.cloud.google.com
+
+client_id=743006490419-1nu370gbp7fan1cc57nkdie239f89260.apps.googleusercontent.com
+client_secret=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
+
+
+npx shadcs@latest init -d
