@@ -6,6 +6,8 @@ import Link from 'next/link'
 import React from 'react'
 import {useForm} from 'react-hook-form' 
 import * as z from 'zod'
+import { useAction } from 'next-safe-action/hooks'
+import { loginAction } from '@/server/actions/login-action'
 const Login = () => {
   const {register,handleSubmit,formState:{errors}} =useForm<z.infer<typeof loginSchema>>({
     resolver:zodResolver(loginSchema),
@@ -15,8 +17,14 @@ const Login = () => {
     }
   })
 
+  const {execute,result,status}=useAction(loginAction)
+
   const onSubmit=(data:z.infer<typeof loginSchema>)=>{
+    //  const{email,password}=data
+    //  execute({email,password})
     console.log(data)
+    const{email,password}=data
+    execute({email,password})
   }
   return (
    <AuthForm formTitle='Log in to your account' footerHerf='/auth/register' footerLabel="Don't have an accouont"
@@ -49,11 +57,11 @@ const Login = () => {
           {errors.password && <p className="text-red-500 text-xs">{errors.password.message}</p>}
         </div>
         <div className='flex flex-col gap-3'>
-          <Link className='w-full text-blue-600 hover:underline ' href={""}>Forgot Password</Link>
+          <Link className='w-full text-blue-600 hover:underline ' href={"/auth/reset"}>Forgot Password?</Link>
 
         <button 
           type="submit" 
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition font-medium"
+          className={`w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition font-medium ${status === "executing" && "animate-pulse"}`}
         >
           Login
         </button>

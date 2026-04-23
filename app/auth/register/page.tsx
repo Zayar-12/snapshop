@@ -6,18 +6,23 @@ import React from 'react'
 import {useForm} from 'react-hook-form'
 import * as z from 'zod'
 import Link from 'next/link';
+import {useAction} from 'next-safe-action/hooks'
+import { registerAction } from '@/server/actions/register-action';
 const Register = () => {
   const{register,handleSubmit,formState:{errors}} =useForm<z.infer<typeof registerSchema>>({
     resolver:zodResolver(registerSchema),
     defaultValues:{
-      username:"",
+      name:"",
       email:"",
       password:"",
     }
   });
 
+  
+const {execute,status,result}=useAction(registerAction)
   const onSubmit=(data:z.infer<typeof registerSchema>)=>{
-
+  const {name,email,password}=data
+   execute({name,email,password})
 
   }
   return (
@@ -28,11 +33,11 @@ const Register = () => {
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium">Name</label>
           <input 
-            {...register("username")}
+            {...register("name")}
             placeholder="Zay Yar Lin Tun" 
             className="border rounded-md p-2 outline-none focus:ring-2 focus:ring-blue-500 transition"
           />
-          {errors.username && <p className="text-red-500 text-xs">{errors.username.message}</p>}
+          {errors.name && <p className="text-red-500 text-xs">{errors.name.message}</p>}
         </div>
 
         {/* Email Field */}
@@ -59,14 +64,14 @@ const Register = () => {
           />
           {errors.password && <p className="text-red-500 text-xs">{errors.password.message}</p>}
         </div>
-        <div className='flex flex-col gap-3'>
-          <Link className='w-full text-blue-600 hover:underline ' href={""}>Forgot Password</Link>
+        <div className='flex flex-col gap-3 '>
+          <Link className='w-full text-blue-600 hover:underline ' href={"/auth/reset"}>Forgot Password?</Link>
 
         <button 
           type="submit" 
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition font-medium"
-        >
-          Login
+          className={`w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition font-medium ${status === 'executing' && "animate-pulse"}`}
+        > 
+        Register
         </button>
         </div>
 
