@@ -4,10 +4,13 @@ import {
   text,
   primaryKey,
   integer,
+  boolean,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import { drizzle } from "drizzle-orm/postgres-js"; // သို့မဟုတ် မင်းသုံးနေတဲ့ driver
 import type { AdapterAccount } from "next-auth/adapters";
 
+export const RoleEnum=pgEnum("roles",['user','admin'])
 // ၁။ Users Table (လူတစ်ယောက်ချင်းစီရဲ့ အချက်အလက်)
 export const users = pgTable("user", {
   id: text("id")
@@ -17,6 +20,8 @@ export const users = pgTable("user", {
   email: text("email").unique(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
+  isTwoFactorEnabled:boolean('isTwoFactorEnabled').default(false),
+  role:RoleEnum("roles").default("user")
 });
 
 // ၂။ Accounts Table (Google သို့မဟုတ် GitHub နဲ့ ချိတ်ဆက်တဲ့ အချက်အလက်)
