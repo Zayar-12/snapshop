@@ -9,15 +9,17 @@ import {
 } from "drizzle-orm/pg-core";
 import { drizzle } from "drizzle-orm/postgres-js"; // သို့မဟုတ် မင်းသုံးနေတဲ့ driver
 import type { AdapterAccount } from "next-auth/adapters";
+import { createId } from "@paralleldrive/cuid2";
 
 export const RoleEnum=pgEnum("roles",['user','admin'])
 // ၁။ Users Table (လူတစ်ယောက်ချင်းစီရဲ့ အချက်အလက်)
 export const users = pgTable("user", {
   id: text("id")
     .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
+    .$defaultFn(() => createId()),//today notion
   name: text("name"),
   email: text("email").unique(),
+  password:text("password"),//today notion
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
   isTwoFactorEnabled:boolean('isTwoFactorEnabled').default(false),
@@ -46,5 +48,22 @@ export const accounts = pgTable(
     compoundKey: primaryKey({
       columns: [account.provider, account.providerAccountId],
     }),
+  })
+);
+
+
+
+export const emailVerificationToken = pgTable(
+  "email_verification_token",
+  {
+    id: text("id")
+      .notNull()
+      .$defaultFn(() => createId()), //today notion
+    token: text("token").notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+    email: text("email").notNull(),
+  },
+  (vt) => ({
+    compoundKey: primaryKey({ columns: [vt.id, vt.token] }), // today notion( store 2 rows per time, cons=>more space,pros=>fast retrieving time ), the primary key is id+token
   })
 );

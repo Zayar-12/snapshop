@@ -8,8 +8,10 @@ import * as z from 'zod'
 import Link from 'next/link';
 import {useAction} from 'next-safe-action/hooks'
 import { registerAction } from '@/server/actions/register-action';
+import { toast } from 'sonner';
+import { redirect } from 'next/dist/server/api-utils';
 const Register = () => {
-  const{register,handleSubmit,formState:{errors}} =useForm<z.infer<typeof registerSchema>>({
+  const{register,handleSubmit,formState:{errors},reset} =useForm<z.infer<typeof registerSchema>>({
     resolver:zodResolver(registerSchema),
     defaultValues:{
       name:"",
@@ -19,7 +21,18 @@ const Register = () => {
   });
 
   
-const {execute,status,result}=useAction(registerAction)
+const {execute,status,result}=useAction(registerAction,{
+     onSuccess({data}){
+      reset();
+      toast.success(data.success,{
+        action:{
+          label:"Open Gmail",
+          onClick:()=> {window.open("https://mail.google.com","_blank")}
+        }
+      })
+     
+     }
+})
   const onSubmit=(data:z.infer<typeof registerSchema>)=>{
   const {name,email,password}=data
    execute({name,email,password})
