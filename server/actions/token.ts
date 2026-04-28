@@ -75,7 +75,7 @@ export const confirmEmailToken= async (token:string)=>{
         email:confirmUser.email,
     }).where(eq(users.id,confirmUser.id))
 
-    await db.delete(emailVerificationToken).where(eq(emailVerificationToken.id,confirmUser.id))
+    await db.delete(emailVerificationToken).where(eq(emailVerificationToken.id,hasToken.id))
 
     return {success:"Email verified"}
 
