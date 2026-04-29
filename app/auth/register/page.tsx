@@ -10,6 +10,7 @@ import {useAction} from 'next-safe-action/hooks'
 import { registerAction } from '@/server/actions/register-action';
 import { toast } from 'sonner';
 import { redirect } from 'next/dist/server/api-utils';
+import { stat } from 'fs';
 const Register = () => {
   const{register,handleSubmit,formState:{errors},reset} =useForm<z.infer<typeof registerSchema>>({
     resolver:zodResolver(registerSchema),
@@ -24,12 +25,19 @@ const Register = () => {
 const {execute,status,result}=useAction(registerAction,{
      onSuccess({data}){
       reset();
-      toast.success(data.success,{
+
+      if(data.error){
+        toast.error(data.error)
+      }
+     if(data.success){
+       toast.success(data.success,{
         action:{
           label:"Open Gmail",
           onClick:()=> {window.open("https://mail.google.com","_blank")}
         }
-      })
+      }
+    )
+     }
      
      }
 })
@@ -83,6 +91,7 @@ const {execute,status,result}=useAction(registerAction,{
         <button 
           type="submit" 
           className={`w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition font-medium ${status === 'executing' && "animate-pulse"}`}
+        disabled={status === "executing"}
         > 
         Register
         </button>
