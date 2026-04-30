@@ -7,6 +7,8 @@ import { users } from "../schema"
 import { generateEmailVerificationToken } from "./token"
 import { sendEmail } from "./email"
 import { signIn } from "../auth"
+import { AuthError } from "next-auth"
+import { error } from "console"
 
 
  export const loginAction=actionClient
@@ -15,6 +17,8 @@ import { signIn } from "../auth"
  
   try {
       const existingUser= await db.query.users.findFirst({where:eq(users.email,email)})
+
+     if(!existingUser) return {error:"User not found"}
 
       if(existingUser?.email !== email){
         return {error:"Please enter the valid credentials"}
@@ -31,8 +35,16 @@ import { signIn } from "../auth"
 
        await signIn("credentials",{email,password,redirectTo:"/"});
     return {success:"Login Successful"}
-  } catch (error) {
-     throw error
+  } catch (error ) {
+    if(error instanceof AuthError){
+      switch(error.type){
+        case "CredentialsSignin" : return {error:"Please provide the valid credentials"};
+        case "OAuthSignInError": return {error:error.message}
+      }
+    }
+    throw error
+
+    
   }
    
 

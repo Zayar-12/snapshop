@@ -8,8 +8,10 @@ import {useForm} from 'react-hook-form'
 import * as z from 'zod'
 import { useAction } from 'next-safe-action/hooks'
 import { loginAction } from '@/server/actions/login-action'
+import { toast } from 'sonner'
+
 const Login = () => {
-  const {register,handleSubmit,formState:{errors}} =useForm<z.infer<typeof loginSchema>>({
+  const {register,handleSubmit,formState:{errors},reset} =useForm<z.infer<typeof loginSchema>>({
     resolver:zodResolver(loginSchema),
     defaultValues:{
       email:"",
@@ -17,7 +19,25 @@ const Login = () => {
     }
   })
 
-  const {execute,result,status}=useAction(loginAction)
+  const {execute,result,status}=useAction(loginAction,{
+     onSuccess({data}){
+      reset();
+
+      if(data.error){
+        toast.error(data.error)
+      }
+     if(data.success){
+       toast.success(data.success,{
+        // action:{
+        //   label:"Open Gmail",
+        //   onClick:()=> {window.open("https://mail.google.com","_blank")}
+        // }
+      }
+    )
+     }
+     
+     }
+})
 
   const onSubmit=(data:z.infer<typeof loginSchema>)=>{
     //  const{email,password}=data
